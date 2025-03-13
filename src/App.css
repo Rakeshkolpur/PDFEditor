@@ -1,0 +1,151 @@
+/* PDF Editor Styles */
+
+/* Editor container */
+.pdf-editor-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: auto;
+}
+
+/* Canvas container */
+.pdf-canvas-container {
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+  background-color: white;
+}
+
+/* Editable text container */
+.pdf-text-editor {
+  background-color: transparent;
+  /* Make sure this text is visible and clear */
+  color: #000000;
+  text-shadow: none;
+  font-family: inherit;
+  mix-blend-mode: normal;
+  unicode-bidi: isolate;
+  direction: ltr;
+  text-align: left;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Ensure editing UI is clean */
+.pdf-text-editor.editing {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  z-index: 100 !important;
+  unicode-bidi: isolate;
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Styles for selected text elements */
+.pdf-text-editor.selected {
+  cursor: grab !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+}
+
+/* Styles for dragging text elements */
+.pdf-text-editor.dragging {
+  cursor: grabbing !important;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.7);
+  opacity: 0.9;
+  z-index: 50 !important;
+}
+
+/* Make sure text is always visible and clean */
+.pdf-text-editor {
+  color-adjust: exact;
+  print-color-adjust: exact;
+  forced-color-adjust: none;
+}
+
+/* PDF Canvas container - hide text rendering */
+canvas.pdf-canvas-no-text {
+  /* This ensures that text on the canvas doesn't show through */
+  filter: none;
+}
+
+/* Text mask for hiding original text */
+.pdf-text-mask {
+  position: absolute;
+  background-color: white;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Editable content styling */
+[contenteditable=true]:focus {
+  outline: none;
+}
+
+/* Toolbar styling */
+.toolbar button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Text selection highlight */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive adjustments for the wider editor */
+@media (max-width: 1200px) {
+  .pdf-editor-container {
+    padding: 0 10px;
+  }
+}
+
+/* Ensure the sidebar stays at a reasonable width even with a wide editor */
+.pdf-sidebar {
+  min-width: 250px;
+  max-width: 300px;
+  overflow-y: auto;
+}
+
+/* Status bar styling */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* A4 dimensions indicator */
+.a4-indicator {
+  display: inline-flex;
+  align-items: center;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  margin-left: 1rem;
+}
+
+/* Additional styles for text masking */
+.pdf-text-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 1;
+  line-height: 1.0;
+  user-select: none;
+}
+
+/* Hide PDF.js text layer */
+.pdf-js-text {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Force left-to-right text for all inputs in the editor */
+[contenteditable="true"] {
+  direction: ltr !important;
+  unicode-bidi: isolate;
+}
