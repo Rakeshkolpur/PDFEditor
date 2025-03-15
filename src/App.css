@@ -149,3 +149,124 @@ canvas.pdf-canvas-no-text {
   direction: ltr !important;
   unicode-bidi: isolate;
 }
+
+/* Photoshop-like toolbar styles */
+.photoshop-toolbar {
+  background-color: #252525;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  max-height: calc(100vh - 60px);
+  color: #e0e0e0;
+  user-select: none;
+  transition: width 0.2s, height 0.2s, opacity 0.3s;
+}
+
+.photoshop-toolbar.expanded {
+  width: 70px;
+  padding: 4px;
+}
+
+.photoshop-toolbar.collapsed {
+  width: auto;
+  padding: 0;
+}
+
+.photoshop-toolbar .toolbar-header {
+  cursor: grab;
+  touch-action: none;
+}
+
+.photoshop-toolbar .toolbar-header:active {
+  cursor: grabbing;
+}
+
+/* Make the icons look more like Photoshop */
+.photoshop-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  font-size: 14px;
+  background-color: transparent;
+  color: #d4d4d4;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.photoshop-toolbar button:hover {
+  background-color: #454545;
+  transform: none;
+}
+
+.photoshop-toolbar button:active {
+  background-color: #555555;
+}
+
+.photoshop-toolbar button.active {
+  background-color: #0078d7;
+  color: #ffffff;
+}
+
+/* Remove vertical toolbar styles that are no longer needed */
+.vertical-toolbar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  overflow-y: auto;
+  background-color: #1e1e1e;
+  border-right: 1px solid #333;
+  padding: 1rem;
+  z-index: 100;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+  color: #e0e0e0;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1e1e1e;
+}
+
+/* Editor with vertical toolbar no longer needed - we'll use a different approach */
+.editor-with-vertical-toolbar {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* Add custom scrollbar styling for the toolbar */
+.photoshop-toolbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.photoshop-toolbar::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.photoshop-toolbar::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 6px;
+}
+
+/* Draggable indicator */
+.toolbar-header {
+  position: relative;
+}
+
+.toolbar-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(to right, #444, #666, #444);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.toolbar-header:hover::before {
+  opacity: 1;
+}

@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   FaBold, FaItalic, FaUnderline, FaFont, FaPalette, 
   FaLink, FaAlignLeft, FaAlignCenter, FaAlignRight, 
-  FaSearchPlus, FaSearchMinus, FaUndo, FaRedo, FaLayerGroup
+  FaSearchPlus, FaSearchMinus, FaUndo, FaRedo, FaLayerGroup,
+  FaRuler, FaCrop, FaHandPointer, FaMousePointer, FaMagic,
+  FaGripLines, FaChevronLeft, FaChevronRight, FaTimes,
+  FaPen, FaEraser, FaShapes, FaPaintBrush, FaEye, FaFillDrip
 } from 'react-icons/fa';
 
 const Toolbar = ({ scale, onZoomChange, selectedText, onTextChange }) => {
   const [fontSize, setFontSize] = useState(14);
   const [fontFamily, setFontFamily] = useState('Arial');
   const [textColor, setTextColor] = useState('#000000');
+  const [collapsed, setCollapsed] = useState(false);
+  const [position, setPosition] = useState({ x: 10, y: 100 });
+  const [dragging, setDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const toolbarRef = useRef(null);
   
   const zoomOptions = [
     { value: 0.5, label: '50%' },
@@ -28,23 +36,61 @@ const Toolbar = ({ scale, onZoomChange, selectedText, onTextChange }) => {
     'Helvetica'
   ];
 
+  // Handle dragging
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (dragging) {
+        setPosition({
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y
+        });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setDragging(false);
+    };
+
+    if (dragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragging, dragOffset]);
+
+  const startDrag = (e) => {
+    if (toolbarRef.current) {
+      const rect = toolbarRef.current.getBoundingClientRect();
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+      setDragging(true);
+    }
+  };
+
+  const toggleCollapse = () => {
+    setCollapsed(!collapsed);
+  };
+
   const applyBold = () => {
     if (selectedText) {
-      // In a real implementation, this would apply bold formatting to the selected text
       console.log('Applying bold to', selectedText.id);
     }
   };
 
   const applyItalic = () => {
     if (selectedText) {
-      // In a real implementation, this would apply italic formatting to the selected text
       console.log('Applying italic to', selectedText.id);
     }
   };
 
   const applyUnderline = () => {
     if (selectedText) {
-      // In a real implementation, this would apply underline formatting to the selected text
       console.log('Applying underline to', selectedText.id);
     }
   };
@@ -54,7 +100,6 @@ const Toolbar = ({ scale, onZoomChange, selectedText, onTextChange }) => {
     setFontSize(newSize);
     
     if (selectedText) {
-      // In a real implementation, this would change the font size of the selected text
       console.log('Changing font size to', newSize, 'for', selectedText.id);
     }
   };
@@ -64,7 +109,6 @@ const Toolbar = ({ scale, onZoomChange, selectedText, onTextChange }) => {
     setFontFamily(newFont);
     
     if (selectedText) {
-      // In a real implementation, this would change the font family of the selected text
       console.log('Changing font to', newFont, 'for', selectedText.id);
     }
   };
@@ -74,7 +118,6 @@ const Toolbar = ({ scale, onZoomChange, selectedText, onTextChange }) => {
     setTextColor(newColor);
     
     if (selectedText) {
-      // In a real implementation, this would change the color of the selected text
       console.log('Changing color to', newColor, 'for', selectedText.id);
     }
   };
@@ -84,157 +127,141 @@ const Toolbar = ({ scale, onZoomChange, selectedText, onTextChange }) => {
     onZoomChange(newScale);
   };
 
-  // Main toolbar that's always visible
-  const mainToolbar = (
-    <div className="flex items-center space-x-2 mb-4 bg-white p-2 rounded-md shadow-sm">
-      <div className="flex items-center border-r border-gray-300 pr-2 mr-2">
-        <button 
-          onClick={() => onZoomChange(scale - 0.1)}
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Zoom Out"
-        >
-          <FaSearchMinus />
-        </button>
-        
-        <select 
-          value={scale} 
-          onChange={handleZoom}
-          className="mx-2 border rounded p-1"
-        >
-          {zoomOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        
-        <button 
-          onClick={() => onZoomChange(scale + 0.1)}
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Zoom In"
-        >
-          <FaSearchPlus />
-        </button>
+  // Single tool button component
+  const ToolButton = ({ icon, title, onClick, active = false, color }) => (
+    <button
+      onClick={onClick}
+      className={`p-2 mb-1 rounded-md transition-all duration-200 relative group ${
+        active 
+          ? 'bg-blue-600 text-white shadow-md' 
+          : 'text-gray-100 hover:bg-gray-700 hover:text-white'
+      }`}
+      title={title}
+    >
+      <div className="flex justify-center items-center" style={color ? {color} : {}}>
+        {icon}
       </div>
-      
-      <div className="flex items-center border-r border-gray-300 pr-2 mr-2">
-        <button 
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Undo"
-        >
-          <FaUndo />
-        </button>
-        <button 
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Redo"
-        >
-          <FaRedo />
-        </button>
-      </div>
-      
-      <div className="flex items-center">
-        <div className="text-sm text-gray-600">
-          {selectedText ? 'Text selected' : 'Click on text to edit'}
-        </div>
-      </div>
-    </div>
+      <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 pointer-events-none">
+        {title}
+      </span>
+    </button>
   );
 
-  // Text editing toolbar that appears when text is selected
-  const textEditingToolbar = selectedText && (
-    <div className="flex flex-wrap items-center space-x-2 mb-4 bg-white p-2 rounded-md shadow-sm">
-      <div className="flex items-center border-r border-gray-300 pr-2 mr-2">
+  // Photoshop-like icon-only toolbar when expanded
+  const expandedToolbar = (
+    <>
+      <div 
+        className="toolbar-header flex justify-between items-center p-1 mb-2 border-b border-gray-600 cursor-move"
+        onMouseDown={startDrag}
+      >
+        <div className="text-xs text-gray-400">Tools</div>
         <button 
-          onClick={applyBold}
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Bold"
+          onClick={toggleCollapse} 
+          className="p-1 text-gray-400 hover:text-white"
+          title="Collapse"
         >
-          <FaBold />
-        </button>
-        <button 
-          onClick={applyItalic}
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Italic"
-        >
-          <FaItalic />
-        </button>
-        <button 
-          onClick={applyUnderline}
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Underline"
-        >
-          <FaUnderline />
+          <FaChevronLeft size={12} />
         </button>
       </div>
-      
-      <div className="flex items-center border-r border-gray-300 pr-2 mr-2">
-        <div className="flex items-center">
-          <FaFont className="mr-1 text-gray-600" />
-          <select 
-            value={fontFamily} 
-            onChange={handleFontFamilyChange}
-            className="border rounded p-1"
-          >
-            {fontOptions.map(font => (
-              <option key={font} value={font}>
-                {font}
-              </option>
-            ))}
-          </select>
+
+      <div className="grid grid-cols-2 gap-1">
+        <ToolButton icon={<FaHandPointer />} title="Select Tool" />
+        <ToolButton icon={<FaMousePointer />} title="Direct Selection" />
+        <ToolButton icon={<FaFont />} title="Text Tool" active={true} />
+        <ToolButton icon={<FaPen />} title="Pen Tool" />
+        <ToolButton icon={<FaPaintBrush />} title="Brush Tool" color="#f97316" />
+        <ToolButton icon={<FaEraser />} title="Eraser Tool" />
+        <ToolButton icon={<FaRuler />} title="Measure Tool" />
+        <ToolButton icon={<FaCrop />} title="Crop Tool" />
+        <ToolButton icon={<FaShapes />} title="Shapes Tool" color="#3b82f6" />
+        <ToolButton icon={<FaMagic />} title="Magic Wand" color="#8b5cf6" />
+        <ToolButton icon={<FaFillDrip />} title="Fill Tool" color="#ec4899" />
+        <ToolButton icon={<FaEye />} title="View Tool" />
+      </div>
+
+      {!selectedText ? (
+        <div className="mt-4 border-t border-gray-600 pt-2">
+          <div className="flex justify-between mb-2">
+            <ToolButton 
+              icon={<FaSearchMinus size={14} />} 
+              title="Zoom Out" 
+              onClick={() => onZoomChange(scale - 0.1)}
+            />
+            <div className="text-center text-gray-300 text-xs font-medium py-2">
+              {Math.round(scale * 100)}%
+            </div>
+            <ToolButton 
+              icon={<FaSearchPlus size={14} />} 
+              title="Zoom In" 
+              onClick={() => onZoomChange(scale + 0.1)}
+            />
+          </div>
+          
+          <div className="px-1">
+            <input 
+              type="range" 
+              min="0.5" 
+              max="3" 
+              step="0.1" 
+              value={scale} 
+              onChange={(e) => onZoomChange(parseFloat(e.target.value))}
+              className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
         </div>
-        
-        <div className="flex items-center ml-2">
-          <input 
-            type="number" 
-            value={fontSize} 
-            onChange={handleFontSizeChange}
-            min="8"
-            max="72"
-            className="border rounded w-14 p-1"
-          />
-          <span className="ml-1 text-sm text-gray-600">pt</span>
+      ) : (
+        <div className="mt-4 border-t border-gray-600 pt-2">
+          <div className="grid grid-cols-3 gap-1">
+            <ToolButton icon={<FaBold size={14} />} title="Bold" onClick={applyBold} />
+            <ToolButton icon={<FaItalic size={14} />} title="Italic" onClick={applyItalic} />
+            <ToolButton icon={<FaUnderline size={14} />} title="Underline" onClick={applyUnderline} />
+          </div>
+          
+          <div className="mt-2 px-1">
+            <div className="flex items-center text-gray-400 text-xs mb-1">
+              <div className="w-3 h-3 rounded-sm mr-2" style={{ backgroundColor: textColor }}></div>
+              <span>Color</span>
+            </div>
+            <input 
+              type="color" 
+              value={textColor} 
+              onChange={handleColorChange}
+              className="w-full h-6 bg-transparent cursor-pointer"
+            />
+          </div>
         </div>
-      </div>
-      
-      <div className="flex items-center border-r border-gray-300 pr-2 mr-2">
-        <div className="flex items-center">
-          <FaPalette className="mr-1 text-gray-600" />
-          <input 
-            type="color" 
-            value={textColor} 
-            onChange={handleColorChange}
-            className="w-8 h-8 p-1"
-          />
-        </div>
-      </div>
-      
-      <div className="flex items-center">
-        <button 
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Align Left"
-        >
-          <FaAlignLeft />
-        </button>
-        <button 
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Align Center"
-        >
-          <FaAlignCenter />
-        </button>
-        <button 
-          className="p-2 hover:bg-gray-100 rounded"
-          title="Align Right"
-        >
-          <FaAlignRight />
-        </button>
-      </div>
+      )}
+    </>
+  );
+
+  // Collapsed version - just a single button
+  const collapsedToolbar = (
+    <div 
+      className="toolbar-header flex justify-center items-center p-1 cursor-move"
+      onMouseDown={startDrag}
+    >
+      <button 
+        onClick={toggleCollapse} 
+        className="p-2 text-gray-200 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md"
+        title="Expand Toolbar"
+      >
+        <FaLayerGroup />
+      </button>
     </div>
   );
 
   return (
-    <div className="toolbar sticky top-0 z-10">
-      {mainToolbar}
-      {textEditingToolbar}
+    <div 
+      ref={toolbarRef}
+      className={`toolbar photoshop-toolbar ${collapsed ? 'collapsed' : 'expanded'}`}
+      style={{
+        position: 'fixed',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        zIndex: 1000,
+      }}
+    >
+      {collapsed ? collapsedToolbar : expandedToolbar}
     </div>
   );
 };

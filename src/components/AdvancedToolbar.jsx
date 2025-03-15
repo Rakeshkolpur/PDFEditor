@@ -34,7 +34,7 @@ const AdvancedToolbar = ({ currentTool, setCurrentTool, onAddPage }) => {
   return (
     <div className="flex flex-col w-full">
       {/* Main toolbar */}
-      <div className="flex items-center bg-white border rounded-md shadow-sm">
+      <div className="flex items-center justify-center m-auto bg-white border rounded-md shadow-sm">
         {tools.map((tool) => (
           <button
             key={tool.id}

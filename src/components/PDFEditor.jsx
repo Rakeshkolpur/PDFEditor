@@ -501,16 +501,16 @@ const PDFEditor = () => {
   }, [selectedText, processing]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
       {/* Header/Toolbar */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-gray-800 border-b border-gray-700 shadow-md">
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-800">Online PDF editor <span className="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded">BETA</span></h1>
+            <h1 className="text-2xl font-bold text-gray-100">PDF editor <span className="text-sm bg-blue-900 text-blue-200 px-2 py-0.5 rounded">BETA</span></h1>
             <div className="flex space-x-2">
               <button
                 onClick={() => fileInputRef.current.click()}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center transition-colors"
                 disabled={processing}
               >
                 <FaPlus className="mr-2" /> Open PDF
@@ -525,7 +525,7 @@ const PDFEditor = () => {
               {pdfJsDoc && (
                 <button
                   onClick={toggleOriginalText}
-                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center"
+                  className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center transition-colors"
                   title={showOriginalText ? "Hide original text" : "Show original text"}
                 >
                   {showOriginalText ? <FaEyeSlash className="mr-2" /> : <FaEye className="mr-2" />}
@@ -535,8 +535,8 @@ const PDFEditor = () => {
               <button
                 onClick={downloadPDF}
                 disabled={!pdfLibDoc || processing}
-                className={`px-4 py-2 rounded flex items-center ${
-                  pdfLibDoc && !processing ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                className={`px-4 py-2 rounded flex items-center transition-colors ${
+                  pdfLibDoc && !processing ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                 }`}
               >
                 <FaDownload className="mr-2" /> Download
@@ -548,7 +548,7 @@ const PDFEditor = () => {
 
       {/* Advanced toolbar - only show when PDF is loaded */}
       {pdfJsDoc && (
-        <div className="bg-gray-50 border-b border-gray-200 py-2 px-4">
+        <div className="bg-gray-800 border-b border-gray-700 py-2 px-4">
           <div className="container mx-auto">
             <AdvancedToolbar 
               currentTool={currentTool}
@@ -565,9 +565,9 @@ const PDFEditor = () => {
           <div className="flex flex-col items-center justify-center h-full">
             <LoadingSpinner />
             {processing && (
-              <div className="mt-4 text-lg text-gray-700">
+              <div className="mt-4 text-lg text-gray-300">
                 <p>{processingMessage}</p>
-                <div className="w-64 h-2 bg-gray-200 rounded-full mt-2">
+                <div className="w-64 h-2 bg-gray-700 rounded-full mt-2">
                   <div className="h-full bg-blue-600 rounded-full animate-pulse" style={{ width: '80%' }}></div>
                 </div>
               </div>
@@ -575,25 +575,26 @@ const PDFEditor = () => {
           </div>
         ) : !pdfJsDoc ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-xl text-gray-600 mb-4">Upload a PDF to get started</p>
+            <p className="text-xl text-gray-400 mb-4">Upload a PDF to get started</p>
             <button
               onClick={() => fileInputRef.current.click()}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center transition-colors"
             >
               <FaPlus className="mr-2" /> Open PDF
             </button>
           </div>
         ) : (
           <div className="flex h-full">
-            {/* Document viewer */}
+            {/* Toolbar is now positioned absolutely via its own internal styling */}
+            <Toolbar 
+              scale={scale} 
+              onZoomChange={handleZoom} 
+              selectedText={selectedText}
+              onTextChange={handleTextEdit}
+            />
+            
+            {/* Document viewer - no longer needs the editor-with-vertical-toolbar class */}
             <div className="flex-1 overflow-auto p-4 relative">
-              <Toolbar 
-                scale={scale} 
-                onZoomChange={handleZoom} 
-                selectedText={selectedText}
-                onTextChange={handleTextEdit}
-              />
-              
               <div className="pdf-editor-container">
                 <div 
                   ref={pdfContainerRef}
@@ -606,12 +607,12 @@ const PDFEditor = () => {
                   {/* Canvas for rendering the PDF (without text) */}
                   <canvas 
                     ref={canvasRef} 
-                    className="pdf-canvas-no-text border border-gray-300" 
+                    className="pdf-canvas-no-text border border-gray-600 shadow-xl" 
                   />
                   
                   {/* Edit tip tooltip */}
                   {showEditTip && (
-                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-bounce">
+                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-blue-700 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-bounce">
                       <p className="text-sm font-medium">Click on any text to edit it!</p>
                     </div>
                   )}
@@ -787,7 +788,7 @@ const PDFEditor = () => {
             </div>
             
             {/* Sidebar for thumbnails/navigation */}
-            <div className="w-64 bg-white border-l border-gray-200 p-4 overflow-y-auto pdf-sidebar">
+            <div className="w-64 bg-gray-800 border-l border-gray-700 p-4 overflow-y-auto pdf-sidebar">
               <PageNavigator
                 currentPage={currentPage}
                 numPages={numPages}
@@ -799,12 +800,12 @@ const PDFEditor = () => {
       </div>
       
       {/* Status bar */}
-      <footer className="bg-white border-t border-gray-200 py-2 px-4 status-bar">
-        <div className="flex justify-between items-center text-sm text-gray-600">
+      <footer className="bg-gray-800 border-t border-gray-700 py-2 px-4 status-bar">
+        <div className="flex justify-between items-center text-sm text-gray-400">
           <div>
             {pdfJsDoc && `Page ${currentPage} of ${numPages}`}
             {pdfJsDoc && 
-              <span className="a4-indicator">
+              <span className="a4-indicator text-blue-300">
                 <span className="mr-1">Editor:</span> 
                 <span className="font-medium">{Math.round(editorDimensions.width)}px</span> 
                 <span className="mx-1">×</span> 
@@ -816,7 +817,7 @@ const PDFEditor = () => {
           <div className="flex items-center">
             {file && `File: ${file.name}`}
             {hasUnsavedChanges && (
-              <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-md text-xs font-medium">
+              <span className="ml-2 px-2 py-0.5 bg-yellow-900 text-yellow-200 rounded-md text-xs font-medium">
                 Unsaved changes
               </span>
             )}
